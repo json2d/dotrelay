@@ -1,16 +1,19 @@
 import sys
 from os import path
-sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) ) # the boilerplate we're actually trying to replace with this lib
 
 import unittest
-
-import pything as pyt
 
 class TestEverything(unittest.TestCase):
 
   def test_base(self):
     
-    self.assertEqual(pyt.do_stuff(), 42)
-    self.assertEqual(pyt.do_crazier_stuff(), 42)
+    try:
+        from cool_math import advanced_math
+        advanced_math.sqr(2)
+
+    except ImportError:
+        self.fail("basic import from a relayed path failed unexpectedly!")
+
 
 unittest.main()
