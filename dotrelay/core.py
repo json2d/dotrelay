@@ -26,9 +26,10 @@ class Relay():
       curr_path = os.path.dirname(curr_path) # go up to parent path
       relay_file_path = os.path.join(curr_path, '.relay')
       if os.path.exists(relay_file_path):
-        log.info(f'depth of {depth} reached - .relay file found in {self.mod_path} - adding to module import path...')
+        log.info(f'depth of {depth} reached - .relay file found in {curr_path} - adding to module import path...')
         self.mod_path = curr_path
-        sys.path.append(self.mod_path)
+        if self.mod_path not in sys.path:
+          sys.path.append(self.mod_path)
         break
       else:
         log.info(f'depth of {depth} reached - .relay file not found in {curr_path} - checking parent path...')
