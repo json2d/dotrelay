@@ -20,6 +20,8 @@ class Relay():
     self.mod_path = None
   
   def __enter__(self):
+    '''scan ancestor directories up to a certain depth for the first relay file and add that directory to the module import context'''
+
     curr_path = self.path
 
     for depth in range(1, self.max_depth+1):
@@ -40,6 +42,8 @@ class Relay():
     return self
 
   def __exit__(self, type, value, traceback):
+    '''remove relayed directory from the module import context'''
+
     if self.mod_path:
       log.debug(f'finished relaying {self.mod_path} to {self.path} - removing from module import path...')
       sys.path.remove(self.mod_path)
