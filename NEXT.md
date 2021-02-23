@@ -10,7 +10,7 @@ dotrelay.flush() # 👃 better not though - this could potentially and unintenti
 ```
 
 ### why it's safer to flush changes
-under-the-hood, changing the module import context with `sys.path.append(special_mod_path)` has a global effect, meaning it becomes the module import context for all imports that follow, even ones in other files.
+under-the-hood, changing the module import context with `sys.path.append(special_resolved_path)` has a global effect, meaning it becomes the module import context for all imports that follow, even ones in other files.
 
 in the best cases you just end up polluting the context but everything still works as expected
 
@@ -36,5 +36,26 @@ with dotrelay.Relay(__file__): # changes to module import context are temporary
 
 ```
 
+### a strict mode
+might want the default behavior to be to raise an exception if `.relay` is not found. makes sense because if relaying fails then the inner code block with the imports from ancestor context won't work
+
+```py
+import dotrelay
+with dotrelay.Relay(__file__, strict=False): # default is strict=True, so this is if for some reason it doesn't matter if relaying fails, maybe just a warning here
+  import some_module_in_ancestor
+```
+
+### good names
+
+```py
+import dotrelay
+with dotrelay.Relay(origin_path=__file__, strict=False) as r:
+  import some_module_in_ancestor
+  logger.info(f'started in {r.origin_path} and found {r.resolved_path}')  
+```
+
+### but really you should call it
+
+a `Receiver` because that what the `__file__` is, then the `.relay` file conceptually would be the `Relay`
 > ### Disclaimer 
 > The contents of this file is a fairly coherent stream of conscience brainstorm about different direction to take the design of this library, and intended to be documentation with accurate code examples that reflect how you would actually use the library. For that refer to `README.md`
