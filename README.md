@@ -4,46 +4,34 @@
 
 enhance your module import context with brevity
 
-## Problem
 
-importing modules locally is hard (in Python)
-
-```
-.
-├── animals
-│   ├── __init__.py
-│   ├── birds.py
-│   ├── fish.py
-│   └── wolverines.py
-├── lands
-│   ├── __init__.py
-│   └── deserts.py
-└── waters
-    ├── __init__.py
-    └── oceans.py
+## Quick install
+```bash
+pip install dotrelay
 ```
 
-in order to import `birds` and `fish` into `oceans` you'd need this bit of bloat:
+## Basic usage
+out-of-the-box here's how to use `dotrelay` to import a module from an ancestor directory containing a `.relay` file:
 
 ```py
-# oceans.py
-import sys
-from os
-root_path = os.path.dirname( os.path.dirname( path.abspath(__file__) ) ) # the dir that contains animals, lands, and waters
-sys.path.append(root_path)
+import dotrelay
 
-from animals import birds, fish # that thing we need
-
-sys.path.remove(root_path) # cleanup
+with dotrelay.Radio(__file__): # 📻
+  import some_relatively_external_module
 ```
 
-[links to stackoverflow questions discussing various ways to best do some kind of imporrt]
+## Problem
 
-so forget about importing modules locally from outer space (in Python)
+importing [relatively external] modules is hard (in Python)
+
+don't believe? ask this 10+ years of discussion on the internet:
+- https://stackoverflow.com/questions/6323860/sibling-package-imports
+
+
+so forget about importing modules from [outer space/another galaxy]:
 
 ```
 .
-├── .relay
 ├── andromeda
 │   └── ufos.py -- 🛸🛸🛸
 └── milky_way
@@ -61,30 +49,35 @@ so forget about importing modules locally from outer space (in Python)
                 └── oceans.py
 ```
 
-to import `ufos` into `deserts`
+in order to import `ufos` into `deserts` you'd need this bit of boilerplate:
 
 ```py
 # deserts.py
 import sys
-from os
-root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__) ) ) ) ) ) # the dir that contains milky_way and andromeda
-sys.path.append(root_path)
+import os
 
-from andromeda import ufos # that thing we need
+# get directory path containing andromeda (relatively from this module's file path)
+root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__) ) ) ) ) ) 
 
-sys.path.remove(root_path) # cleanup
+sys.path.append(root_path) # extend module import context 
+from andromeda import ufos # import that thing we need
+sys.path.remove(root_path) # cleanup 
 
 ufos.abduct_cattle(mode='random') # finally the real work can begin
 
 ```
 
+commonly referred to as a "`sys.path` hack", this is what we want to avoid. it's fairly low level, fairly ugly, noisy and just plain makes the code smelly 👃🏽
+
+
+
 ## Solution
 
-we can make this better - we have the technology. 
+so let's make this better - we have the technology
 
 for starters let's create a `.relay` file in the directory containing `andromeda`, the module we want to import into `oceans`
 
-[the `.relay` file also needs to be in one of `oceans` ancestor directories]
+> **_NOTE:_* this `.relay` file must be in one of `oceans` ancestor directories to be discoverable
 
 ```
 .
@@ -106,21 +99,23 @@ for starters let's create a `.relay` file in the directory containing `andromeda
                 └── oceans.py
 ```
 
-now in `oceans` we can use a `dotrelay.Radio` to _discover the `.relay` file above it_ and establish a temporary bridge for us to import `andromeda` and/or other modules in the relay directory
+now in `oceans` we can use a `dotrelay.Radio` to _discover the `.relay` file above it_ and _establish a kind of temporary bridge_ for us to import `andromeda` and/or other modules in the relay directory
 
 ```py
 # deserts.py
 import dotrelay
-with dotrelay.Radio(__file__) as rad: # 📻
+with dotrelay.Radio(__file__): # 📻
   from andromeda import ufos
 
 ufos.abduct_cattle(mode='psuedo-random') # yes it happened
 ```
 
-## Common scenarios
+now this boilerplate is fairly high level, fairly clean, short and sweet
 
-### Testing
-fun example aside, here's a typical file structure for most python lib projects, where there's the main module and some test modules
+## Common scenarios
+fun example aside, lets see how this fits into real world projects
+### Testing modules
+so here's a typical file structure for most python lib projects where there's the main module and some test modules
 
 ```
 .
@@ -136,8 +131,8 @@ in order to test `pything` it needs to be imported into `units`, and you end up 
 ```py
 # units.py
 import sys
-from os
-root_path = os.path.dirname( os.path.dirname( path.abspath(__file__) ) ) # the dir that contains pything and tests
+import os
+root_path = os.path.dirname( os.path.dirname( path.abspath(__file__) ) ) # the directory that contains pything
 sys.path.append(root_path)
 
 import pything
@@ -145,16 +140,53 @@ import pything
 sys.path.remove(root_path) # cleanup
 
 import unittest
+
 # ...
 ```
 
-an awkward thing to have to include this in every test that will be written
+an awkward thing to have to include this in every single test module
 
-### Module Mobility
+with `dotrelay` this becomes:
 
-additionally, if `units.py` were to be moved somewhere the code for getting the `root_path` would need to be updated since its relative to the module's own path
+```
+.
+├── .relay -- 📡
+├── pything
+│   ├── __init__.py
+│   └── main.py
+└── tests
+    └── units.py
+```
 
-so then overtime, as a project matures, this becomes something you may have to manage. but that can all be avoided.
+and the boilerplate is reduced to:
+
+```py
+# tests/units.py
+import dotrelay
+with dotrelay.Radio(__file__): # 📻
+  import pything
+```
+
+### Organizing modules
+
+additionally, say `units` were to be moved deeper into the project:
+
+```
+.
+├── .relay -- 📡
+├── pything
+│   ├── __init__.py
+│   └── main.py
+└── tests
+    └── basic
+        └── units.py
+```
+
+with a "`sys.path` hack" the code for getting the `root_path` would need to be updated since again it's relative to the module's own file path
+
+so then overtime, as a project matures, this becomes something that needs to be manage. 
+
+but that can all be avoided with `dotrelay`. no changes need to be made as long as the `.relay` file remains with one of `units` ancestor directories
 
 ### Reading static files
 
@@ -167,10 +199,12 @@ sometimes it's also useful just having the path of the relay directory
 │   ├── __init__.py
 │   └── main.py
 └── fixtures
-│   └── data.json
+│   └── data.json -- 📝
 └── tests
     └── units.py
 ```
+
+so to read `fixtures/data.json` from `units`:
 
 ```py
 # tests/units.py
@@ -187,42 +221,7 @@ import unittest
 # ...
 ```
 
+echoing the point from the previous scenario, this works well when you need to move the static files around the project
 
-## Quick install
-```bash
-pip install dotrelay
-```
 
-## Basic usage
-
-[decent pitch]. Let's dive in.
-
-Out-of-the-box here's how to use `dotrelay` to import a module from an arbitrarily deep ancestor path containing a `.relay` file:
-
-```py
-import dotrelay
-
-with dotrelay.begin(__file__):
-  import some_module_in_ancestor
-  import another_module_in_ancestor
-
-```
-
-## Boilerplate reduction
-
-Here's what this suppose to replaced:
-
-```py
-import sys
-from os
-
-ancestor_path = os.path.dirname( os.path.dirname( path.abspath(__file__) ) ) # for ancestor path at depth=2
-sys.path.append(ancestor_path)
-
-import some_module_in_ancestor
-import another_module_in_ancestor
-
-sys.path.remove(ancestor_path)
-
-```
 
