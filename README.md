@@ -1,6 +1,6 @@
 # 📡 dotrelay
 [![PyPI version](https://badge.fury.io/py/dotrelay.svg)](https://badge.fury.io/py/dotrelay)
-[![Build Status](https://travis-ci.com/json2d/dotrelay.svg?branch=master)](https://travis-ci.com/json2d/dotrelay) [![Coverage Status](https://coveralls.io/repos/github/json2d/dotrelay/badge.svg?branch=master)](https://coveralls.io/github/json2d/dotrelay?branch=master)
+[![Build Status](https://travis-ci.com/json2d/dotrelay.svg?branch=main)](https://travis-ci.com/json2d/dotrelay) [![Coverage Status](https://coveralls.io/repos/github/json2d/dotrelay/badge.svg?branch=main)](https://coveralls.io/github/json2d/dotrelay?branch=main)
 
 enhance your module import context with brevity
 
