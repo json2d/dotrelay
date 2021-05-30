@@ -22,13 +22,13 @@ with dotrelay.Radio(__file__): # 📻
 
 ## Problem
 
-importing [relatively external] modules is hard (in Python)
+importing _relatively external_ modules is hard (in Python 🐍)
 
-don't believe? ask this 10+ years of discussion on the internet:
+don't believe? just check out this 10+ years of discussion on the internet:
 - https://stackoverflow.com/questions/6323860/sibling-package-imports
 
 
-so forget about importing modules from [outer space/another galaxy]:
+so forget about importing modules from _another galaxy_:
 
 ```
 .
@@ -56,24 +56,26 @@ in order to import `ufos` into `deserts` you'd need this bit of boilerplate:
 import sys
 import os
 
-# get directory path containing andromeda (relatively from this module's file path)
+# get directory path containing `andromeda` (relatively from this module's file path)
 root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__) ) ) ) ) ) 
 
 sys.path.append(root_path) # extend module import context 
 from andromeda import ufos # import that thing we need
 sys.path.remove(root_path) # cleanup 
 
-ufos.abduct_cattle(mode='random') # finally the real work can begin
+# finally the real work can begin
+def lose_cattle_mysteriously(cattle):
+  ufos.abduct_cattle(cattle, mode='random')
 
 ```
 
-commonly referred to as a "`sys.path` hack", this is what we want to avoid. it's fairly low level, fairly ugly, noisy and just plain makes the code smelly 👃🏽
+commonly referred to as a "`sys.path` hack", this is what we want to provide a better alternative for - it's fairly low level, fairly ugly, noisy and just plain makes the code smelly 👃🏽
 
 
 
 ## Solution
 
-so let's make this better - we have the technology
+so let's make this better - we have the technology!
 
 for starters let's create a `.relay` file in the directory containing `andromeda`, the module we want to import into `oceans`
 
@@ -107,13 +109,14 @@ import dotrelay
 with dotrelay.Radio(__file__): # 📻
   from andromeda import ufos
 
-ufos.abduct_cattle(mode='psuedo-random') # yes it happened
+def lose_cattle_mysteriously(cattle):
+  ufos.abduct_cattle(cattle, mode='psuedo-random') # yes it happened
 ```
 
-now this boilerplate is fairly high level, fairly clean, short and sweet
+now the boilerplate has been reduced to something fairly high level, fairly clean, short and sweet
 
 ## Common scenarios
-fun example aside, lets see how this fits into real world projects
+fun example aside, lets see how this fits into real world scenarios
 ### Testing modules
 so here's a typical file structure for most python lib projects where there's the main module and some test modules
 
@@ -126,7 +129,7 @@ so here's a typical file structure for most python lib projects where there's th
     └── units.py
 ```
 
-in order to test `pything` it needs to be imported into `units`, and you end up with that bloat:
+in order to test `pything` it needs to be imported into `units`, and you end up with more of that "`sys.path` hack" bloat:
 
 ```py
 # units.py
@@ -144,9 +147,9 @@ import unittest
 # ...
 ```
 
-an awkward thing to have to include this in every single test module
+an awkward thing to have to include in every single test module
 
-with `dotrelay` this becomes:
+with `dotrelay` we simply add the `.relay` file:
 
 ```
 .
@@ -169,7 +172,7 @@ with dotrelay.Radio(__file__): # 📻
 
 ### Organizing modules
 
-additionally, say `units` were to be moved deeper into the project:
+building off the previous example, say `units` were to be moved deeper into the project file structure:
 
 ```
 .
@@ -184,7 +187,7 @@ additionally, say `units` were to be moved deeper into the project:
 
 with a "`sys.path` hack" the code for getting the `root_path` would need to be updated since again it's relative to the module's own file path
 
-so then overtime, as a project matures, this becomes something that needs to be manage. 
+so really then, overtime, as a project matures, this hack becomes something that needs to be manage. 
 
 but that can all be avoided with `dotrelay`. no changes need to be made as long as the `.relay` file remains with one of `units` ancestor directories
 
@@ -221,7 +224,7 @@ import unittest
 # ...
 ```
 
-echoing the point from the previous scenario, this works well when you need to move the static files around the project
+echoing the point from the previous example, this feature is pretty usefule when you need to move the static files around in a project
 
 
 
