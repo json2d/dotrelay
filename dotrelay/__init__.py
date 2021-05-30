@@ -1,1 +1,1 @@
-from .core import Relay as begin
+from .core import init, Relay

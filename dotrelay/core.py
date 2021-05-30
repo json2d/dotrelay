@@ -7,6 +7,11 @@ import sys
 
 MAX_DEPTH = 10
 
+def init(path, max_depth=MAX_DEPTH):
+  relay = Relay(path, max_depth)
+  relay.__enter__()
+  return relay
+
 # use context manager
 class Relay():
   def __init__(self, path, max_depth=MAX_DEPTH):
@@ -16,19 +21,22 @@ class Relay():
   
   def __enter__(self):
     curr_path = self.path
-    for depth in range(0, self.max_depth):
+
+    for depth in range(1, self.max_depth+1):
+      curr_path = os.path.dirname(curr_path) # go up to parent path
       relay_file_path = os.path.join(curr_path, '.relay')
-      if depth > 0 and os.path.exists(relay_file_path):
-        log.debug(f'depth of {depth} reached - .relay file found in {self.mod_path} - adding to module import path...')
+      if os.path.exists(relay_file_path):
+        log.info(f'depth of {depth} reached - .relay file found in {self.mod_path} - adding to module import path...')
         self.mod_path = curr_path
         sys.path.append(self.mod_path)
         break
       else:
-        log.debug(f'depth of {depth} reached - .relay file not found in {curr_path} - checking parent path...')
-        curr_path = os.path.dirname(curr_path) # go up to parent path
+        log.info(f'depth of {depth} reached - .relay file not found in {curr_path} - checking parent path...')
 
     if not self.mod_path:    
-      log.warn(f'max depth of {depth} reached - .relay file not found in any ancestor paths - no changes were made to module import path.')
+      log.warning(f'max depth of {depth} reached - .relay file not found in any ancestor paths - no changes were made to module import path.')
+    
+    return self
 
   def __exit__(self, type, value, traceback):
     if self.mod_path:
