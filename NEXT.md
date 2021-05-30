@@ -110,6 +110,33 @@ the relay path might be how we get to our static files
 with open(os.path.join(ROOT_PATH, 'data', 'space_data.json'), 'r') as fp: SPACE_DATA = json.load(fp)
 ```
 
+### top down
+lets get crazy and let the `.relay` file specify more paths to extend the mod import path with
+
+```
+milky_way/sol/earth
+```
+
+
+```py
+# andromeda/ufos.py
+
+import dotrelay
+
+with dotrelay.Radio(__file__):
+  from earth import humans
+
+def send_to_earth(agent, mission):
+  agent.fly_to_earth()
+  agent.disguise_as(humans.random())
+  agent.do_mission(mission)
+
+```
+
+does this make the `.relay` file a more appealing a vector for some kind of cyber attack?
+
+also probably doesnt make sense because it conflicts with the idea of a module heirarchy? not sure
+
 
 > ### Disclaimer 
 > The contents of this file is a fairly coherent stream of conscience brainstorm about different direction to take the design of this library, and intended to be documentation with accurate code examples that reflect how you would actually use the library. For that refer to `README.md`

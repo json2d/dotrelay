@@ -35,7 +35,7 @@ class Relay():
           sys.path.append(self.resolved_path)
         break
       else:
-        log.info(f'depth of {depth} reached - .relay file not found in {curr_path} - checking parent context...')
+        log.info(f'depth of {depth} reached - .relay file not found in {curr_path} - checking next parent...')
 
     if not self.resolved_path:    
       log.warning(f'max depth of {depth} reached - .relay file not found in any ancestor paths - no changes were made to module import context.')
