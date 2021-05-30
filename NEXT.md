@@ -10,7 +10,7 @@ dotrelay.flush() # 👃 better not though - this could potentially and unintenti
 ```
 
 ### why it's safer to flush changes
-under-the-hood, changing the module import context with `sys.path.append(special_mod_path)` has a global effect, meaning it becomes the module import context for all imports that follow, even ones in other files.
+under-the-hood, changing the module import context with `sys.path.append(special_resolved_path)` has a global effect, meaning it becomes the module import context for all imports that follow, even ones in other files.
 
 in the best cases you just end up polluting the context but everything still works as expected
 
@@ -35,6 +35,81 @@ with dotrelay.Relay(__file__): # changes to module import context are temporary
   import some_module_in_ancestor
 
 ```
+
+### a strict mode
+might want the default behavior to be to raise an exception if `.relay` is not found. makes sense because if relaying fails then the inner code block with the imports from ancestor context won't work
+
+```py
+import dotrelay
+with dotrelay.Relay(__file__, strict=False): # default is strict=True, so this is if for some reason it doesn't matter if relaying fails, maybe just a warning here
+  import some_module_in_ancestor
+```
+
+### good names
+
+```py
+import dotrelay
+with dotrelay.Relay(origin_path=__file__, strict=False) as r:
+  import some_module_in_ancestor
+  logger.info(f'started in {r.origin_path} and found {r.resolved_path}')  
+```
+
+### but really you should call it
+
+a `Receiver` because that's what the `__file__` is, then the `.relay` file conceptually would be the `Relay`
+
+```py
+import dotrelay
+with dotrelay.Receiver(__file__) as receiver:
+  logger.info(f'receiver picked up the relayed path {receiver.relay_path}! 🛰')  
+  import some_module_in_relayed_path
+```
+
+a runner up more fun name would be `Radio`. also its 3 letters shorter than `Receiver` and has it's own emoji 📻
+
+```py
+import dotrelay
+with dotrelay.Radio(__file__) as rad:
+  logger.info(f'📻 radio picked up the relayed path {rad.relay_path}! 🛰')  
+  import some_module_in_relayed_path
+  ROOT_PATH = rad.relay_path
+
+# this might be how we get to our static files
+with open(os.path.join(ROOT_PATH, 'data', 'space_data.json'), 'r') as fp: SPACE_DATA = json.load(fp)
+```
+
+this reads alot better, more self documenting and intuitive
+
+### parameterize the relay filename
+
+`relay_filename` param would be useful maybe for some interesting usecases
+
+```py
+from dotrelay import Radio
+with Radio(__file__, relay_filename='ROOT.relay') as rad:
+  ROOT_PATH = rad.relay_path
+
+with Radio(__file__, '🔥.relay') as rad:
+  FIRE_PATH = rad.relay_path  
+```
+
+### another real usecase 
+
+besides temporary module context extensions, might be useful just to get the relay path if that dir is special for some reason
+
+```py
+import dotrelay
+with dotrelay.Radio(__file__) as rad:
+  ROOT_PATH = rad.relay_path
+
+```
+
+the relay path might be how we get to our static files
+
+```py
+with open(os.path.join(ROOT_PATH, 'data', 'space_data.json'), 'r') as fp: SPACE_DATA = json.load(fp)
+```
+
 
 > ### Disclaimer 
 > The contents of this file is a fairly coherent stream of conscience brainstorm about different direction to take the design of this library, and intended to be documentation with accurate code examples that reflect how you would actually use the library. For that refer to `README.md`
