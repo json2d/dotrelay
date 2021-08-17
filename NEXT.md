@@ -31,7 +31,7 @@ import some_module_in_ancestor
 but if you need to a bit of protection for peace of mind:
 ```py
 import dotrelay
-with dotrelay.Relay(__file__): # changes to module import context are temporary
+with dotrelay.Radio(__file__): # changes to module import context are temporary
   import some_module_in_ancestor
 
 ```
@@ -41,7 +41,7 @@ might want the default behavior to be to raise an exception if `.relay` is not f
 
 ```py
 import dotrelay
-with dotrelay.Relay(__file__, strict=False): # default is strict=True, so this is if for some reason it doesn't matter if relaying fails, maybe just a warning here
+with dotrelay.Radio(__file__, strict=False): # default is strict=True, so this is if for some reason it doesn't matter if relaying fails, maybe just a warning here
   import some_module_in_ancestor
 ```
 
@@ -49,14 +49,14 @@ with dotrelay.Relay(__file__, strict=False): # default is strict=True, so this i
 
 ```py
 import dotrelay
-with dotrelay.Relay(origin_path=__file__, strict=False) as r:
+with dotrelay.Radio(origin_path=__file__, strict=False) as r:
   import some_module_in_ancestor
   logger.info(f'started in {r.origin_path} and found {r.resolved_path}')  
 ```
 
 ### but really you should call it
 
-a `Receiver` because that's what the `__file__` is, then the `.relay` file conceptually would be the `Relay`
+a `Receiver` because that's what the `__file__` is, then the `.relay` file conceptually would be the `Radio`
 
 ```py
 import dotrelay

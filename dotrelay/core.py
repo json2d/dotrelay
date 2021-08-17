@@ -9,12 +9,12 @@ MAX_DEPTH = 10
 RELAY_FILENAME = '.relay'
 
 def init(path, max_depth=MAX_DEPTH):
-  relay = Relay(path, max_depth)
-  relay.__enter__()
-  return relay
+  radio = Radio(path, max_depth)
+  radio.__enter__()
+  return radio
 
 # use context manager
-class Relay():
+class Radio():
   def __init__(self, origin_path, max_depth=MAX_DEPTH):
     self.origin_path = os.path.abspath(origin_path)
     self.max_depth = max_depth
