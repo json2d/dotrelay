@@ -6,7 +6,7 @@ import unittest
 
 class TestEverything(unittest.TestCase):
 
-  def test_base(self):
+  def test__base(self):
     
     try:
         from cool_math import advanced_math
@@ -14,6 +14,16 @@ class TestEverything(unittest.TestCase):
 
     except ImportError:
         self.fail("basic import from a relayed path failed unexpectedly!")
+
+
+  def test__context_manager(self):
+
+    try:
+        from cool_math import advanced_math_w_context_manager
+        advanced_math_w_context_manager.sqr(2)
+
+    except ImportError:
+        self.fail("basic import from a relayed path (via context manager strategy) failed unexpectedly!")
 
 
 unittest.main()
