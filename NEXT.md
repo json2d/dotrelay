@@ -10,7 +10,7 @@ dotrelay.flush() # 👃 better not though - this could potentially and unintenti
 ```
 
 ### why it's safer to flush changes
-under-the-hood, changing the module import context with `sys.path.append(special_resolved_path)` has a global effect, meaning it becomes the module import context for all imports that follow, even ones in other files.
+under-the-hood, changing the module import context with `sys.path.append(special_relay_path)` has a global effect, meaning it becomes the module import context for all imports that follow, even ones in other files.
 
 in the best cases you just end up polluting the context but everything still works as expected
 
@@ -51,7 +51,7 @@ with dotrelay.Radio(__file__, strict=False): # default is strict=True, so this i
 import dotrelay
 with dotrelay.Radio(origin_path=__file__, strict=False) as r:
   import some_module_in_ancestor
-  logger.info(f'started in {r.origin_path} and found {r.resolved_path}')  
+  logger.info(f'started in {r.origin_path} and found {r.relay_path}')  
 ```
 
 ### but really you should call it
