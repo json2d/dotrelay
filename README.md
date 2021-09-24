@@ -2,8 +2,7 @@
 [![PyPI version](https://badge.fury.io/py/dotrelay.svg)](https://badge.fury.io/py/dotrelay)
 [![Build Status](https://travis-ci.com/json2d/dotrelay.svg?branch=main)](https://travis-ci.com/json2d/dotrelay) [![Coverage Status](https://coveralls.io/repos/github/json2d/dotrelay/badge.svg?branch=main)](https://coveralls.io/github/json2d/dotrelay?branch=main)
 
-enhance your module import context with brevity
-
+a utility library for declaring relative imports in Python
 
 ## Quick install
 ```bash
